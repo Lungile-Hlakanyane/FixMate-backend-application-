@@ -12,6 +12,7 @@ import com.fixmate.backend_application.mapper.UserMapper;
 import com.fixmate.backend_application.repository.UserRepository;
 import com.fixmate.backend_application.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -25,6 +26,9 @@ public class UserServiceImp implements UserService {
     @Autowired
     public UserRepository userRepository;
 
+    @Autowired
+    public PasswordEncoder passwordEncoder;
+
     @Override
     public UserResponse register(UserRegistrationRequest req) {
         if(userRepository.existsByEmail(req.getEmail())){
@@ -33,7 +37,7 @@ public class UserServiceImp implements UserService {
         User user = new User();
         user.setFullName(req.getFullName());
         user.setEmail(req.getEmail().toLowerCase());
-        user.setPassword(req.getPassword()); //TODO: change this to hash password when spring security imported in the POM file as the dependency
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setRole(req.getRole());
         user.setPhone(req.getPhone());
         user.setLocation(req.location);

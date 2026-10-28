@@ -25,4 +25,13 @@ public interface ServiceRequestService {
     long countByAssignedProAndJobStatus(Long proId, JobStatus jobStatus);
     long countProActiveJobs(Long proId, JobStatus jobStatus);
     Double getProTotalEarnings(Long proId);
+    List<ServiceRequestResponseDTO> getPaidServiceRequestByPro(Long proId, JobStatus jobStatus);
+    Double getAmountAccumulatedThisMonth(Long proId);
+    List<ServiceRequestResponseDTO> getRequestsByProAndJobStatus(Long proId, JobStatus jobStatus);
+    Double getTotalEarningsThisMonth(Long proId);
+
+    //NEW 3 METHODS
+    long getAwaitingPaymentCount(Long proId);
+    Double getAwaitingPaymentTotal(Long proId);
+    List<ServiceRequestResponseDTO> getAwaitingPaymentJobs(Long proId);
 }

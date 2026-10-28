@@ -1,6 +1,7 @@
 package com.fixmate.backend_application.controller;
 import com.fixmate.backend_application.dto.ServiceRequestCreateDTO;
 import com.fixmate.backend_application.dto.ServiceRequestResponseDTO;
+import com.fixmate.backend_application.entity.ServiceRequest;
 import com.fixmate.backend_application.enums.JobStatus;
 import com.fixmate.backend_application.enums.RequestStatus;
 import com.fixmate.backend_application.enums.ServiceCategory;
@@ -11,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/service-requests")
@@ -115,5 +119,32 @@ public class ServiceRequestController {
     public ResponseEntity<Double> getTotalPaid(@PathVariable Long proId){
         Double total = service.getProTotalEarnings(proId);
         return ResponseEntity.ok(total);
+    }
+
+    @GetMapping("/pro/{proId}/this-month")
+    public ResponseEntity<Double> getThisMonth(@PathVariable Long proId) {
+        Double total = service.getTotalEarningsThisMonth(proId);
+        return ResponseEntity.ok(total); // returns 1000, not {totalThisMonth: 1000}
+    }
+
+    @GetMapping("/pro/{proId}/status/{jobStatus}")
+    public ResponseEntity<List<ServiceRequestResponseDTO>> getPaidServiceRequestForPro(
+            @PathVariable Long proId, @PathVariable JobStatus jobStatus){
+        return ResponseEntity.ok(service.getPaidServiceRequestByPro(proId, jobStatus));
+    }
+
+    @GetMapping("/pro/{proId}/awaiting-payment/count")
+    public ResponseEntity<Long> getAwaitingCount(@PathVariable Long proId){
+        return ResponseEntity.ok(service.getAwaitingPaymentCount(proId));
+    }
+
+    @GetMapping("/pro/{proId}/awaiting-payment/total")
+    public ResponseEntity<Double> getAwaitingTotal(@PathVariable Long proId){
+        return ResponseEntity.ok(service.getAwaitingPaymentTotal(proId));
+    }
+
+    @GetMapping("/pro/{proId}/awaiting-payment")
+    public ResponseEntity<List<ServiceRequestResponseDTO>> getAwaitingJobs(@PathVariable Long proId){
+        return ResponseEntity.ok(service.getAwaitingPaymentJobs(proId));
     }
 }

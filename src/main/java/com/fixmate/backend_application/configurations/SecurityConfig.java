@@ -1,7 +1,14 @@
 package com.fixmate.backend_application.configurations;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-//TODO: FIX IMPLEMENT THE SECURITY CONFIG FILE AND REMOVE THE CROSS ORIGINS IN THE AUTHCONTROLLER CLASS
 @Configuration
 public class SecurityConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 }

@@ -14,6 +14,8 @@ import com.fixmate.backend_application.repository.UserRepository;
 import com.fixmate.backend_application.service.ServiceRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -171,5 +173,49 @@ public class ServiceRequestServiceImp implements ServiceRequestService {
         User user = userRepository.findById(proId).orElseThrow(()->
                 new UserNotFoundException(proId));
         return serviceRequestRepository.getTotalPaidAmountByProId(proId,JobStatus.PAID);
+    }
+
+    @Override
+    public List<ServiceRequestResponseDTO> getPaidServiceRequestByPro(Long proId, JobStatus jobStatus) {
+        User user = userRepository.findById(proId).orElseThrow(()->new UserNotFoundException(proId));
+        return mapper.toDTOList(serviceRequestRepository.findByAssignedProIdAndJobStatus(proId, jobStatus));
+    }
+
+    @Override
+    public Double getAmountAccumulatedThisMonth(Long proId) {
+        LocalDate now = LocalDate.now();
+        LocalDateTime start = now.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime end = now.withDayOfMonth(now.lengthOfMonth()).atTime(23,59,59);
+        return serviceRequestRepository.sumBudgetByProIdAndStatusBetween(
+                proId, JobStatus.COMPLETED, start, end
+        );
+    }
+
+    @Override
+    public List<ServiceRequestResponseDTO> getRequestsByProAndJobStatus(Long proId, JobStatus jobStatus) {
+        User user = userRepository.findById(proId).orElseThrow(()->new UserNotFoundException(proId));
+        return mapper.toDTOList(serviceRequestRepository.findByAssignedProIdAndJobStatus(proId, jobStatus));
+    }
+
+    @Override
+    public Double getTotalEarningsThisMonth(Long proId) {
+        User user = userRepository.findById(proId).orElseThrow(()->new UserNotFoundException(proId));
+        return serviceRequestRepository.getTotalEarningsThisMonth(proId);
+    }
+
+    @Override
+    public long getAwaitingPaymentCount(Long proId) {
+        return serviceRequestRepository.countAwaitingPayment(proId);
+    }
+
+    @Override
+    public Double getAwaitingPaymentTotal(Long proId) {
+        return serviceRequestRepository.sumAwaitingPayment(proId);
+    }
+
+    @Override
+    public List<ServiceRequestResponseDTO> getAwaitingPaymentJobs(Long proId) {
+        return serviceRequestRepository.findByAssignedProIdAndJobStatus(proId, JobStatus.COMPLETED)
+                .stream().map(mapper::toResponseDTO).toList();
     }
 }
